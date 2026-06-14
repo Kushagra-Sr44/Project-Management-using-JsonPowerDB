@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Project Management Form</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Project Management Form</h2>
+
+    <form id="projectForm">
+
+        <div class="form-group">
+            <label>Project ID:</label>
+            <input type="text" class="form-control" id="projectId"
+                   placeholder="Enter Project ID">
+        </div>
+
+        <div class="form-group">
+            <label>Project Name:</label>
+            <input type="text" class="form-control" id="projectName">
+        </div>
+
+        <div class="form-group">
+            <label>Assigned To:</label>
+            <input type="text" class="form-control" id="assignedTo">
+        </div>
+
+        <div class="form-group">
+            <label>Assignment Date:</label>
+            <input type="date" class="form-control" id="assignmentDate">
+        </div>
+
+        <div class="form-group">
+            <label>Deadline:</label>
+            <input type="date" class="form-control" id="deadline">
+        </div>
+
+        <input type="button" class="btn btn-primary" id="saveBtn"
+               value="Save" onclick="saveData();">
+
+        <input type="button" class="btn btn-success" id="updateBtn"
+               value="Update" onclick="updateData();">
+
+        <input type="button" class="btn btn-danger" id="resetBtn"
+               value="Reset" onclick="resetForm();">
+
+    </form>
+</div>
+
+<script>
+
+const connToken = "90935163|-31949241436820825|90958683";
+const dbName = "COLLEGE-DB";
+const relName = "PROJECT-TABLE";
+
+$(document).ready(function () {
+    resetForm();
+});
+
+function resetForm() {
+
+    $("#projectForm")[0].reset();
+
+    $("#projectId").prop("disabled", false).focus();
+
+    $("#projectName").prop("disabled", true);
+    $("#assignedTo").prop("disabled", true);
+    $("#assignmentDate").prop("disabled", true);
+    $("#deadline").prop("disabled", true);
+
+    $("#saveBtn").prop("disabled", true);
+    $("#updateBtn").prop("disabled", true);
+    $("#resetBtn").prop("disabled", true);
+}
+
+function validateData() {
+
+    if ($("#projectId").val() === "") {
+        alert("Project ID is required");
+        $("#projectId").focus();
+        return "";
+    }
+
+    if ($("#projectName").val() === "") {
+        alert("Project Name is required");
+        $("#projectName").focus();
+        return "";
+    }
+
+    if ($("#assignedTo").val() === "") {
+        alert("Assigned To is required");
+        $("#assignedTo").focus();
+        return "";
+    }
+
+    if ($("#assignmentDate").val() === "") {
+        alert("Assignment Date is required");
+        $("#assignmentDate").focus();
+        return "";
+    }
+
+    if ($("#deadline").val() === "") {
+        alert("Deadline is required");
+        $("#deadline").focus();
+        return "";
+    }
+
+    return JSON.stringify({
+        Project_ID: $("#projectId").val(),
+        Project_Name: $("#projectName").val(),
+        Assigned_To: $("#assignedTo").val(),
+        Assignment_Date: $("#assignmentDate").val(),
+        Deadline: $("#deadline").val()
+    });
+}
+
+
+$("#projectId").blur(function () {
+
+    let pid = $("#projectId").val();
+
+    if (pid === "") return;
+
+    var getReq = createGET_BY_KEYRequest(
+        connToken,
+        dbName,
+        relName,
+        JSON.stringify({ Project_ID: pid })
+    );
+
+    jQuery.ajaxSetup({ async: false });
+
+    var res = executeCommandAtGivenBaseUrl(
+        getReq,
+        "http://api.login2explore.com:5577",
+        "/api/irl"
+    );
+
+    jQuery.ajaxSetup({ async: true });
+
+    if (res.status === 400) {
+        $("#projectName").prop("disabled", false);
+        $("#assignedTo").prop("disabled", false);
+        $("#assignmentDate").prop("disabled", false);
+        $("#deadline").prop("disabled", false);
+
+        $("#saveBtn").prop("disabled", false);
+        $("#resetBtn").prop("disabled", false);
+
+        $("#projectName").focus();
+    }
+    else {
+        var data = JSON.parse(res.data).record;
+
+        $("#projectName").val(data.Project_Name);
+        $("#assignedTo").val(data.Assigned_To);
+        $("#assignmentDate").val(data.Assignment_Date);
+        $("#deadline").val(data.Deadline);
+
+        $("#projectId").prop("disabled", true);
+
+        $("#projectName").prop("disabled", false);
+        $("#assignedTo").prop("disabled", false);
+        $("#assignmentDate").prop("disabled", false);
+        $("#deadline").prop("disabled", false);
+
+        $("#updateBtn").prop("disabled", false);
+        $("#resetBtn").prop("disabled", false);
+
+        $("#projectName").focus();
+    }
+});
+
+
+function saveData() {
+
+    let jsonStr = validateData();
+    if (jsonStr === "") return;
+
+    let req = createPUTRequest(connToken, jsonStr, dbName, relName);
+
+    jQuery.ajaxSetup({ async: false });
+
+    executeCommandAtGivenBaseUrl(
+        req,
+        "http://api.login2explore.com:5577",
+        "/api/iml"
+    );
+
+    jQuery.ajaxSetup({ async: true });
+
+    alert("Record Saved Successfully");
+    resetForm();
+}
+
+function updateData() {
+
+    let jsonStr = validateData();
+    if (jsonStr === "") return;
+
+    let req = createUPDATERecordRequest(
+        connToken,
+        jsonStr,
+        dbName,
+        relName,
+        localStorage.getItem("recno")
+    );
+
+    jQuery.ajaxSetup({ async: false });
+
+    executeCommandAtGivenBaseUrl(
+        req,
+        "http://api.login2explore.com:5577",
+        "/api/iml"
+    );
+
+    jQuery.ajaxSetup({ async: true });
+
+    alert("Record Updated Successfully");
+    resetForm();
+}
+
+</script>
+
+</body>
+</html>
