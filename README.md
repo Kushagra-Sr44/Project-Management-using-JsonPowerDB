@@ -7,6 +7,9 @@ It allows users to store, retrieve, and update project details such as Project I
 The application uses JPDB APIs like PUT, GET_BY_KEY, and UPDATE with real-time form validation and database operations.
 
 ---
+## Github Repository:
+## Website Link:
+---
 
 ## Benefits of using JsonPowerDB
 - High-performance and lightweight NoSQL database
