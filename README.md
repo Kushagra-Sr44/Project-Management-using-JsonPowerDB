@@ -7,8 +7,8 @@ It allows users to store, retrieve, and update project details such as Project I
 The application uses JPDB APIs like PUT, GET_BY_KEY, and UPDATE with real-time form validation and database operations.
 
 ---
-# Github Repository: https://github.com/Kushagra-Sr44/Project-Management-using-JsonPowerDB
-# Website Link: https://kushagra-sr44.github.io/Project-Management-using-JsonPowerDB/
+### Github Repository: https://github.com/Kushagra-Sr44/Project-Management-using-JsonPowerDB
+### Website Link: https://kushagra-sr44.github.io/Project-Management-using-JsonPowerDB/
 ---
 
 ## Benefits of using JsonPowerDB
